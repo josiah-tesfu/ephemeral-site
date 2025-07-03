@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ephemeral Dots</title>
+  <style>
+    html, body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="dotCanvas"></canvas>
+
+  <script src="updated_coords.js"></script>
+  <script src="ephemeral_coords.js"></script>
+  <script>
+    const butterflySize = 24;
+    const cycleDuration = 10000;     // 10 seconds
+    const holdDuration = 3000;      // 10 seconds
+
+
+    const canvas = document.getElementById('dotCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const all_coords = [
+      ...updated_coords.map(p => [...p, "main"]),
+      ...ephemeral_coords.map(p => [...p, "ephemeral"])
+    ];
+
+    function getBounds(data) {
+      return data.reduce((acc, [x, y]) => {
+        acc.minX = Math.min(acc.minX, x);
+        acc.minY = Math.min(acc.minY, y);
+        acc.maxX = Math.max(acc.maxX, x);
+        acc.maxY = Math.max(acc.maxY, y);
+        return acc;
+      }, { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+    }
+
+    const boundsMain = getBounds(updated_coords);
+    const boundsEph = getBounds(ephemeral_coords);
+
+    const scaleMain = Math.min(canvas.width / (boundsMain.maxX - boundsMain.minX), canvas.height / (boundsMain.maxY - boundsMain.minY)) * 0.8;
+    const scaleEph = scaleMain * 1;
+
+    const offsetMainX = (canvas.width - scaleMain * (boundsMain.maxX - boundsMain.minX)) / 2;
+    const offsetMainY = (canvas.height - scaleMain * (boundsMain.maxY - boundsMain.minY)) / 2 + 100;
+
+    const offsetEphX = (canvas.width - scaleEph * (boundsEph.maxX - boundsEph.minX)) / 2;
+    const offsetEphY = (canvas.height - scaleEph * (boundsEph.maxY - boundsEph.minY)) / 2 - 265;
+
+    const imageCache = {};
+    const dots = all_coords.map(([x, y, hex, source]) => {
+      const { baseX, baseY } = (() => {
+        if (source === "ephemeral") {
+          const bx = offsetEphX + (x - boundsEph.minX) * scaleEph;
+          const by = offsetEphY + (y - boundsEph.minY) * scaleEph;
+          return { baseX: bx, baseY: by };
+        } else {
+          const bx = offsetMainX + (x - boundsMain.minX) * scaleMain;
+          const by = offsetMainY + (y - boundsMain.minY) * scaleMain;
+          return { baseX: bx, baseY: by };
+        }
+      })();
+      console.log("source: " + source);
+      const motion = (source === "ephemeral")
+        ? { amplitude: 2, speed: 0.004, dispersal: 600 }
+        : { amplitude: 5, speed: 0.004, dispersal: 600 };
+
+      const a = Math.random() * 2 * Math.PI;
+      const r = Math.random() * motion.dispersal;
+      const targetX = baseX + Math.cos(a) * r;
+      const targetY = baseY + Math.sin(a) * r;
+
+      const key = Object.entries({
+        'white': '#FFFFFF', 'pale_ivory': '#F2E8D5', 'sky_blue': '#B8D9F9',
+        'warm_orange': '#F6A06D', 'lavender': '#9E85C4', 'muted_green': '#6BBF59',
+        'warm_brown': '#523F3A', 'slate_blue': '#303952',
+        'bright_red': '#FA5252', 'vivid_yellow': '#FEE440'
+      }).find(([, val]) => val.toLowerCase() === hex.toLowerCase())?.[0] || 'white';
+
+      if (!imageCache[key]) {
+        const img = new Image();
+        img.src = `butterfly_colored/butterfly_${key}.png`;
+        imageCache[key] = img;
+      }
+
+      return {
+        baseX, baseY, targetX, targetY,
+        phaseX: Math.random() * 1000,
+        phaseY: Math.random() * 1000,
+        image: imageCache[key],
+        rotation: Math.random() * 2 * Math.PI,
+        source,
+        ...motion
+      };
+    });
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function animate(timestamp) {
+      const totalCycle = cycleDuration + holdDuration;
+      const t = timestamp % totalCycle;
+      let animT = (t < holdDuration) ? 0 : (() => {
+        const phase = (t - holdDuration) / cycleDuration;
+        return phase < 0.5 ? easeInOutCubic(phase * 2) : easeInOutCubic(2 - phase * 2);
+      })();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const dot of dots) {
+        const jitterX = Math.sin(timestamp * dot.speed + dot.phaseX) * dot.amplitude;
+        const jitterY = Math.cos(timestamp * dot.speed + dot.phaseY) * dot.amplitude;
+
+        const interpX = dot.baseX + (dot.targetX - dot.baseX) * animT + jitterX;
+        const interpY = dot.baseY + (dot.targetY - dot.baseY) * animT + jitterY;
+
+        ctx.save();
+        ctx.translate(interpX, interpY);
+        ctx.rotate(dot.rotation);
+        ctx.drawImage(dot.image, -butterflySize / 2, -butterflySize / 2, butterflySize, butterflySize);
+        ctx.restore();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

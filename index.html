@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ephemeral</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Forum&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Forum', serif;
+      background: transparent;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      font-weight: bold;
+    }
+
+    iframe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: -1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0 3rem;
+      position: relative;
+      z-index: 1;
+      font-size: 2rem;
+      margin-top: 8vh;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .center-title {
+      text-align: center;
+      font-size: 8rem;
+      margin-top: 8vh;
+      margin-bottom: 6vh;
+      z-index: 1;
+      position: relative;
+    }
+
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 5rem;
+      position: relative;
+      z-index: 1;
+      font-size: 4rem;
+      margin-top: 70vh;
+    }
+
+    .countdown {
+      display: flex;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <iframe src="animation/dots.html"></iframe>
+
+  <header>
+    <a href="about.html">ABOUT THE PROJECT</a>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;">
+      <a href="#">tesfu.places@gmail.com</a>
+      <a href="#">@tesfu.places</a>
+    </div>
+  </header>
+
+  <div class="bottom-row">
+    <div>YORK AV. & YEW ST.</div>
+    <div>JULY 5-12</div>
+  </div>
+
+</body>
+</html>
