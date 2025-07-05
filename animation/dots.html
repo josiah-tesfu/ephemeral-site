@@ -52,15 +52,11 @@
     const scaleMain = Math.min(canvas.width / (boundsMain.maxX - boundsMain.minX), canvas.height / (boundsMain.maxY - boundsMain.minY)) * 0.8;
     const scaleEph = scaleMain * 1;
 
-    const verticalPaddingMain = canvas.height * 0.1;
-    const verticalPaddingEph = canvas.height * 0.3;
-
     const offsetMainX = (canvas.width - scaleMain * (boundsMain.maxX - boundsMain.minX)) / 2;
-    const offsetMainY = (canvas.height - scaleMain * (boundsMain.maxY - boundsMain.minY)) / 2 + verticalPaddingMain;
+    const offsetMainY = (canvas.height - scaleMain * (boundsMain.maxY - boundsMain.minY)) / 2 + 100;
 
     const offsetEphX = (canvas.width - scaleEph * (boundsEph.maxX - boundsEph.minX)) / 2;
-    const offsetEphY = (canvas.height - scaleEph * (boundsEph.maxY - boundsEph.minY)) / 2 - verticalPaddingEph;
-
+    const offsetEphY = (canvas.height - scaleEph * (boundsEph.maxY - boundsEph.minY)) / 2 - 265;
 
     const imageCache = {};
     const dots = all_coords.map(([x, y, hex, source]) => {
