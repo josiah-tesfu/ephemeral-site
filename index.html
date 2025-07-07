@@ -6,6 +6,13 @@
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Forum&display=swap" rel="stylesheet" />
   <style>
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
     body {
       margin: 0;
       font-family: 'Forum', serif;
@@ -33,12 +40,12 @@
       padding: 0 3rem;
       position: relative;
       z-index: 1;
-      font-size: 2rem;
+      font-size: 4rem;
       margin-top: 8vh;
     }
 
     header a {
-      color: white;
+      color: #bbbbbb99;
       text-decoration: none;
     }
 
@@ -53,35 +60,109 @@
 
     .bottom-row {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: left;
+      gap: 2rem;
       padding: 0 5rem;
-      position: relative;
+      position: absolute;
+      bottom: 6vh;
       z-index: 1;
       font-size: 4rem;
-      margin-top: 70vh;
+      width: 100%;
     }
 
-    .countdown {
-      display: flex;
-      gap: 1rem;
+    #audio-icon {
+      width: 6rem;
+      height: auto;
     }
+
+    #playButton {
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    #playButton.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .audio-button-container {
+      position: relative;
+      display: flex;
+      justify-content: flex-start;
+      padding: 9rem 7rem;
+    }
+
   </style>
 </head>
 <body>
   <iframe src="animation/dots.html"></iframe>
 
   <header>
-    <a href="about.html">ABOUT THE PROJECT</a>
-    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;">
-      <a href="#">tesfu.places@gmail.com</a>
-      <a href="#">@tesfu.places</a>
-    </div>
+    <a href="about.html">ABOUT</a>
+    <a href="contact.html">CONTACT</a>
   </header>
 
-  <div class="bottom-row">
-    <div>YORK AV. & YEW ST.</div>
-    <div>JULY 5-12</div>
+  <div class="audio-button-container">
+    <button id="playButton">
+      <img id="audio-icon" src="audio-icon.png" alt="Play Audio" />
+    </button>
+    <audio id="audioPlayer" src="art-of-life.mp3"></audio>
   </div>
 
+  <div class="bottom-row">
+    <div>A MURAL.</div>
+    <div>YORK AV. & YEW ST.</div>
+  </div>
+
+  <script>
+    const audio = document.getElementById('audioPlayer');
+    const button = document.getElementById('playButton');
+
+    function startAudio() {
+      audio.play();
+      button.classList.add('hidden');
+      document.removeEventListener('touchstart', startAudio);
+      document.removeEventListener('click', startAudio);
+    }
+
+    document.addEventListener('touchstart', startAudio, { once: true });
+    document.addEventListener('click', startAudio, { once: true });
+
+    window.addEventListener('load', () => {
+      const dimRatio = window.innerWidth / window.innerHeight;
+      const height = screen.height;
+      
+
+      if (dimRatio < 0.5 && dimRatio > 0.4) {
+        const audioContainer = document.querySelector('.audio-button-container');
+        const bottomRow = document.querySelector('.bottom-row');
+        bottomRow.style.padding = '0 5rem';
+        bottomRow.style.bottom = '61vh';
+        audioContainer.style.justifyContent = 'flex-end';
+        audioContainer.style.padding = "11rem 7rem";
+      }
+
+      else if (dimRatio < 0.6 && dimRatio > 0.5) {
+        const audioContainer = document.querySelector('.audio-button-container');
+        const bottomRow = document.querySelector('.bottom-row');
+        bottomRow.style.padding = '0 5rem';
+        bottomRow.style.bottom = '60vh';
+        audioContainer.style.justifyContent = 'flex-end';
+        audioContainer.style.padding = "10rem 7rem";
+      }
+
+      if (dimRatio < 0.65 && dimRatio > 0.6) {
+        const audioContainer = document.querySelector('.audio-button-container');
+        const bottomRow = document.querySelector('.bottom-row');
+        bottomRow.style.padding = '0 5rem';
+        bottomRow.style.bottom = '59vh';
+        audioContainer.style.justifyContent = 'flex-end';
+        audioContainer.style.padding = "6rem 7rem";
+      }
+    });
+
+  </script>
 </body>
 </html>

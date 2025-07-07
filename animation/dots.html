@@ -11,7 +11,6 @@
     }
     canvas {
       display: block;
-      margin: auto;
     }
   </style>
 </head>
@@ -21,11 +20,6 @@
   <script src="updated_coords.js"></script>
   <script src="ephemeral_coords.js"></script>
   <script>
-    const butterflySize = 24;
-    const cycleDuration = 10000;     // 10 seconds
-    const holdDuration = 3000;      // 10 seconds
-
-
     const canvas = document.getElementById('dotCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -49,29 +43,36 @@
     const boundsMain = getBounds(updated_coords);
     const boundsEph = getBounds(ephemeral_coords);
 
-    const scaleMain = Math.min(canvas.width / (boundsMain.maxX - boundsMain.minX), canvas.height / (boundsMain.maxY - boundsMain.minY)) * 0.8;
-    const scaleEph = scaleMain * 1;
+    const baseScale = Math.min(
+      canvas.width / (boundsMain.maxX - boundsMain.minX),
+      canvas.height / (boundsMain.maxY - boundsMain.minY)
+    );
 
-    const offsetMainX = (canvas.width - scaleMain * (boundsMain.maxX - boundsMain.minX)) / 2;
-    const offsetMainY = (canvas.height - scaleMain * (boundsMain.maxY - boundsMain.minY)) / 2 + 100;
+    const globalScale = baseScale * 0.8; // zoomed out effect
 
-    const offsetEphX = (canvas.width - scaleEph * (boundsEph.maxX - boundsEph.minX)) / 2;
-    const offsetEphY = (canvas.height - scaleEph * (boundsEph.maxY - boundsEph.minY)) / 2 - 265;
+    const offsetMainX = (canvas.width - globalScale * (boundsMain.maxX - boundsMain.minX)) / 2;
+    const offsetMainY = (canvas.height - globalScale * (boundsMain.maxY - boundsMain.minY)) / 2 + 100;
+
+    const offsetEphX = (canvas.width - globalScale * (boundsEph.maxX - boundsEph.minX)) / 2;
+    const offsetEphY = (canvas.height - globalScale * (boundsEph.maxY - boundsEph.minY)) / 2 - 265;
+
+    const baseButterflySize = 20;
+    const butterflySize = baseButterflySize * globalScale / baseScale;
 
     const imageCache = {};
     const dots = all_coords.map(([x, y, hex, source]) => {
       const { baseX, baseY } = (() => {
         if (source === "ephemeral") {
-          const bx = offsetEphX + (x - boundsEph.minX) * scaleEph;
-          const by = offsetEphY + (y - boundsEph.minY) * scaleEph;
+          const bx = offsetEphX + (x - boundsEph.minX) * globalScale;
+          const by = offsetEphY + (y - boundsEph.minY) * globalScale;
           return { baseX: bx, baseY: by };
         } else {
-          const bx = offsetMainX + (x - boundsMain.minX) * scaleMain;
-          const by = offsetMainY + (y - boundsMain.minY) * scaleMain;
+          const bx = offsetMainX + (x - boundsMain.minX) * globalScale;
+          const by = offsetMainY + (y - boundsMain.minY) * globalScale;
           return { baseX: bx, baseY: by };
         }
       })();
-      console.log("source: " + source);
+
       const motion = (source === "ephemeral")
         ? { amplitude: 2, speed: 0.004, dispersal: 600 }
         : { amplitude: 5, speed: 0.004, dispersal: 600 };
@@ -104,6 +105,9 @@
         ...motion
       };
     });
+
+    const cycleDuration = 10000;
+    const holdDuration = 3000;
 
     function easeInOutCubic(t) {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
