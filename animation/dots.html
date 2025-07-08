@@ -56,7 +56,7 @@
     const offsetEphX = (canvas.width - globalScale * (boundsEph.maxX - boundsEph.minX)) / 2;
     const offsetEphY = (canvas.height - globalScale * (boundsEph.maxY - boundsEph.minY)) / 2 - 265;
 
-    const baseButterflySize = 18;
+    const baseButterflySize = 20;
     const butterflySize = baseButterflySize * globalScale / baseScale;
 
     const imageCache = {};
@@ -74,8 +74,8 @@
       })();
 
       const motion = (source === "ephemeral")
-        ? { amplitude: 2, speed: 0.004, dispersal: 1000 }
-        : { amplitude: 4, speed: 0.004, dispersal: 1000 };
+        ? { amplitude: 2, speed: 0.004, dispersal: 3000 }
+        : { amplitude: 4, speed: 0.004, dispersal: 3000 };
 
       const a = Math.random() * 2 * Math.PI;
       const r = Math.random() * motion.dispersal;
