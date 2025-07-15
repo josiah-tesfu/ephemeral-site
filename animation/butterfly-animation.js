@@ -1,26 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Ephemeral Dots</title>
-  <style>
-    html, body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="dotCanvas"></canvas>
-
-  <script src="updated_coords.js"></script>
-  <script src="ephemeral_coords.js"></script>
-  <script>
-    const canvas = document.getElementById('dotCanvas');
+const canvas = document.getElementById('dotCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -74,8 +52,8 @@
       })();
 
       const motion = (source === "ephemeral")
-        ? { amplitude: 2, speed: 0.004, dispersal: 1200 }
-        : { amplitude: 4, speed: 0.004, dispersal: 1200 };
+        ? { amplitude: 2, speed: 0.004, dispersal: 800 }
+        : { amplitude: 4, speed: 0.004, dispersal: 800 };
 
       const a = Math.random() * 2 * Math.PI;
       const r = Math.random() * motion.dispersal;
@@ -106,7 +84,7 @@
       };
     });
 
-    const cycleDuration = 10000;
+    const cycleDuration = 15000;
     const holdDuration = 3000;
 
     function easeInOutCubic(t) {
@@ -139,6 +117,3 @@
     }
 
     requestAnimationFrame(animate);
-  </script>
-</body>
-</html>
