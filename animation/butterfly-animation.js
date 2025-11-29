@@ -37,6 +37,23 @@ const canvas = document.getElementById('dotCanvas');
     const baseButterflySize = 20;
     const butterflySize = baseButterflySize * globalScale / baseScale;
 
+    const scaleStdDev = 2 / 3; // 3σ ≈ ±200% scaling relative to base size
+    const minScaleFactor = 0.5;
+    const maxScaleFactor = 4;
+
+    function sampleNormal(mean = 0, stdDev = 1) {
+      let u = 0;
+      let v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      const mag = Math.sqrt(-2 * Math.log(u));
+      return mean + stdDev * mag * Math.cos(2 * Math.PI * v);
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
     const imageCache = {};
     const dots = all_coords.map(([x, y, hex, source]) => {
       const { baseX, baseY } = (() => {
@@ -73,6 +90,9 @@ const canvas = document.getElementById('dotCanvas');
         imageCache[key] = img;
       }
 
+      const scaleOffset = sampleNormal(0, scaleStdDev);
+      const targetScale = clamp(1 + scaleOffset, minScaleFactor, maxScaleFactor);
+
       return {
         baseX, baseY, targetX, targetY,
         phaseX: Math.random() * 1000,
@@ -80,6 +100,7 @@ const canvas = document.getElementById('dotCanvas');
         image: imageCache[key],
         rotation: Math.random() * 2 * Math.PI,
         source,
+        targetScale,
         ...motion
       };
     });
@@ -107,10 +128,13 @@ const canvas = document.getElementById('dotCanvas');
         const interpX = dot.baseX + (dot.targetX - dot.baseX) * animT + jitterX;
         const interpY = dot.baseY + (dot.targetY - dot.baseY) * animT + jitterY;
 
+        const currentScale = 1 + (dot.targetScale - 1) * animT;
+        const currentSize = butterflySize * currentScale;
+
         ctx.save();
         ctx.translate(interpX, interpY);
         ctx.rotate(dot.rotation);
-        ctx.drawImage(dot.image, -butterflySize / 2, -butterflySize / 2, butterflySize, butterflySize);
+        ctx.drawImage(dot.image, -currentSize / 2, -currentSize / 2, currentSize, currentSize);
         ctx.restore();
       }
       requestAnimationFrame(animate);
